@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import com.cooksys.groupfinal.dtos.AnnouncementDto;
 import com.cooksys.groupfinal.dtos.FullUserDto;
 import com.cooksys.groupfinal.dtos.ProjectDto;
+import com.cooksys.groupfinal.dtos.ProjectRequestDto;
 import com.cooksys.groupfinal.dtos.TeamDto;
 import com.cooksys.groupfinal.entities.Announcement;
 import com.cooksys.groupfinal.entities.Company;
@@ -25,6 +26,7 @@ import com.cooksys.groupfinal.mappers.ProjectMapper;
 import com.cooksys.groupfinal.mappers.TeamMapper;
 import com.cooksys.groupfinal.mappers.FullUserMapper;
 import com.cooksys.groupfinal.repositories.CompanyRepository;
+import com.cooksys.groupfinal.repositories.ProjectRepository;
 import com.cooksys.groupfinal.repositories.TeamRepository;
 import com.cooksys.groupfinal.services.CompanyService;
 
@@ -36,6 +38,7 @@ public class CompanyServiceImpl implements CompanyService {
 	
 	private final CompanyRepository companyRepository;
 	private final TeamRepository teamRepository;
+	private final ProjectRepository projectRepository;
 	private final FullUserMapper fullUserMapper;
 	private final AnnouncementMapper announcementMapper;
 	private final TeamMapper teamMapper;
@@ -56,6 +59,14 @@ public class CompanyServiceImpl implements CompanyService {
         }
         return team.get();
     }
+
+	private Project findProject(Long id) {
+		Optional<Project> project = projectRepository.findById(id);
+		if(project.isEmpty()) {
+			throw new NotFoundException("A project with the provided id does not exist.");
+		}
+		return project.get();
+	}
 	
 	@Override
 	public Set<FullUserDto> getAllUsers(Long id) {
@@ -92,6 +103,22 @@ public class CompanyServiceImpl implements CompanyService {
 		team.getProjects().forEach(filteredProjects::add);
 		filteredProjects.removeIf(project -> !project.isActive());
 		return projectMapper.entitiesToDtos(filteredProjects);
+	}
+
+	@Override
+	public ProjectDto updateProjectStatus(Long companyId, Long teamId, Long projectId, ProjectRequestDto projectRequestDto) {
+		Company company = findCompany(companyId);
+		Team team = findTeam(teamId);
+		if (!company.getTeams().contains(team)) {
+			throw new NotFoundException("A team with id " + teamId + " does not exist at company with id " + companyId + ".");
+		}
+		Project project = findProject(projectId);
+
+		project.setActive(projectRequestDto.getActive());
+
+		projectRepository.saveAndFlush(project);
+
+		return projectMapper.entityToDto(project);
 	}
 
 }
