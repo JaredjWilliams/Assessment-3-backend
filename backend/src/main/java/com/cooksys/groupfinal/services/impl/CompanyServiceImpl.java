@@ -13,18 +13,21 @@ import org.springframework.stereotype.Service;
 import com.cooksys.groupfinal.dtos.AnnouncementDto;
 import com.cooksys.groupfinal.dtos.FullUserDto;
 import com.cooksys.groupfinal.dtos.ProjectDto;
+import com.cooksys.groupfinal.dtos.ProjectRequestDto;
 import com.cooksys.groupfinal.dtos.TeamDto;
 import com.cooksys.groupfinal.entities.Announcement;
 import com.cooksys.groupfinal.entities.Company;
 import com.cooksys.groupfinal.entities.Project;
 import com.cooksys.groupfinal.entities.Team;
 import com.cooksys.groupfinal.entities.User;
+import com.cooksys.groupfinal.exceptions.BadRequestException;
 import com.cooksys.groupfinal.exceptions.NotFoundException;
 import com.cooksys.groupfinal.mappers.AnnouncementMapper;
 import com.cooksys.groupfinal.mappers.ProjectMapper;
 import com.cooksys.groupfinal.mappers.TeamMapper;
 import com.cooksys.groupfinal.mappers.FullUserMapper;
 import com.cooksys.groupfinal.repositories.CompanyRepository;
+import com.cooksys.groupfinal.repositories.ProjectRepository;
 import com.cooksys.groupfinal.repositories.TeamRepository;
 import com.cooksys.groupfinal.services.CompanyService;
 
@@ -36,6 +39,7 @@ public class CompanyServiceImpl implements CompanyService {
 	
 	private final CompanyRepository companyRepository;
 	private final TeamRepository teamRepository;
+	private final ProjectRepository projectRepository;
 	private final FullUserMapper fullUserMapper;
 	private final AnnouncementMapper announcementMapper;
 	private final TeamMapper teamMapper;
@@ -56,6 +60,27 @@ public class CompanyServiceImpl implements CompanyService {
         }
         return team.get();
     }
+
+	private Project findProject(Long id) {
+		Optional<Project> project = projectRepository.findById(id);
+		if(project.isEmpty()) {
+			throw new NotFoundException("A project with the provided id does not exist.");
+		}
+		return project.get();
+	}
+
+	private void checkTeamInCompany(Company company, Team team) {
+		if (!company.getTeams().contains(team)) {
+			throw new NotFoundException("A team with id " + team.getId() + " does not exist at company with id " + company.getId() + ".");
+		}
+	}
+
+	private void checkProjectNameEmpty(String name) {
+		if (name.equals("")) {
+			throw new BadRequestException("Cannot set project name to be empty!");
+		} else {
+		}
+	}
 	
 	@Override
 	public Set<FullUserDto> getAllUsers(Long id) {
@@ -85,13 +110,35 @@ public class CompanyServiceImpl implements CompanyService {
 	public Set<ProjectDto> getAllProjects(Long companyId, Long teamId) {
 		Company company = findCompany(companyId);
 		Team team = findTeam(teamId);
-		if (!company.getTeams().contains(team)) {
-			throw new NotFoundException("A team with id " + teamId + " does not exist at company with id " + companyId + ".");
-		}
+		checkTeamInCompany(company, team);
+
 		Set<Project> filteredProjects = new HashSet<>();
 		team.getProjects().forEach(filteredProjects::add);
 		filteredProjects.removeIf(project -> !project.isActive());
 		return projectMapper.entitiesToDtos(filteredProjects);
+	}
+
+	@Override
+	public ProjectDto updateProjectStatus(Long companyId, Long teamId, Long projectId, ProjectRequestDto projectRequestDto) {
+		Company company = findCompany(companyId);
+		Team team = findTeam(teamId);
+		checkTeamInCompany(company, team);
+
+		Project project = findProject(projectId);
+
+		if (!teamId.equals(projectRequestDto.getTeam())) {
+			throw new BadRequestException("A team with id " + projectRequestDto.getTeam() + " cannot change the project for team with id " + teamId);
+		}
+
+		project.setActive(projectRequestDto.getActive());
+		project.setDescription(projectRequestDto.getDescription());
+
+		checkProjectNameEmpty(projectRequestDto.getName());
+		project.setName(projectRequestDto.getName());
+
+		projectRepository.saveAndFlush(project);
+
+		return projectMapper.entityToDto(project);
 	}
 
 }
