@@ -20,6 +20,7 @@ import com.cooksys.groupfinal.entities.Company;
 import com.cooksys.groupfinal.entities.Project;
 import com.cooksys.groupfinal.entities.Team;
 import com.cooksys.groupfinal.entities.User;
+import com.cooksys.groupfinal.exceptions.BadRequestException;
 import com.cooksys.groupfinal.exceptions.NotFoundException;
 import com.cooksys.groupfinal.mappers.AnnouncementMapper;
 import com.cooksys.groupfinal.mappers.ProjectMapper;
@@ -67,6 +68,19 @@ public class CompanyServiceImpl implements CompanyService {
 		}
 		return project.get();
 	}
+
+	private void checkTeamInCompany(Company company, Team team) {
+		if (!company.getTeams().contains(team)) {
+			throw new NotFoundException("A team with id " + team.getId() + " does not exist at company with id " + company.getId() + ".");
+		}
+	}
+
+	private void checkProjectNameEmpty(String name) {
+		if (name.equals("")) {
+			throw new BadRequestException("Cannot set project name to be empty!");
+		} else {
+		}
+	}
 	
 	@Override
 	public Set<FullUserDto> getAllUsers(Long id) {
@@ -96,9 +110,8 @@ public class CompanyServiceImpl implements CompanyService {
 	public Set<ProjectDto> getAllProjects(Long companyId, Long teamId) {
 		Company company = findCompany(companyId);
 		Team team = findTeam(teamId);
-		if (!company.getTeams().contains(team)) {
-			throw new NotFoundException("A team with id " + teamId + " does not exist at company with id " + companyId + ".");
-		}
+		checkTeamInCompany(company, team);
+
 		Set<Project> filteredProjects = new HashSet<>();
 		team.getProjects().forEach(filteredProjects::add);
 		filteredProjects.removeIf(project -> !project.isActive());
@@ -109,12 +122,19 @@ public class CompanyServiceImpl implements CompanyService {
 	public ProjectDto updateProjectStatus(Long companyId, Long teamId, Long projectId, ProjectRequestDto projectRequestDto) {
 		Company company = findCompany(companyId);
 		Team team = findTeam(teamId);
-		if (!company.getTeams().contains(team)) {
-			throw new NotFoundException("A team with id " + teamId + " does not exist at company with id " + companyId + ".");
-		}
+		checkTeamInCompany(company, team);
+
 		Project project = findProject(projectId);
 
+		if (!teamId.equals(projectRequestDto.getTeam())) {
+			throw new BadRequestException("A team with id " + projectRequestDto.getTeam() + " cannot change the project for team with id " + teamId);
+		}
+
 		project.setActive(projectRequestDto.getActive());
+		project.setDescription(projectRequestDto.getDescription());
+
+		checkProjectNameEmpty(projectRequestDto.getName());
+		project.setName(projectRequestDto.getName());
 
 		projectRepository.saveAndFlush(project);
 
