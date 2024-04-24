@@ -7,6 +7,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 
 import com.cooksys.groupfinal.dtos.TeamDto;
+import com.cooksys.groupfinal.dtos.TeamRequestDto;
 import com.cooksys.groupfinal.entities.Team;
 
 @Mapper(componentModel = "spring", uses = { BasicUserMapper.class })
@@ -20,5 +21,7 @@ public interface TeamMapper {
   default void setNumberOfProjects(Team team, @MappingTarget TeamDto teamDto) {
     teamDto.setNumberOfProjects(team.getProjects().size());
   }
+
+  Team requestDtoToEntity(TeamRequestDto teamRequestDto);
 
 }

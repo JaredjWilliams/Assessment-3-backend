@@ -3,6 +3,8 @@ package com.cooksys.groupfinal.services.impl;
 import java.util.Optional;
 import java.util.Set;
 
+import javax.swing.text.html.HTMLDocument.Iterator;
+
 import org.springframework.stereotype.Service;
 
 import com.cooksys.groupfinal.dtos.TeamDto;
@@ -36,11 +38,21 @@ public class TeamServiceImpl implements TeamService {
         return companyOptional.get();
     }
 
+    public void checkUser(Set<Long> ids) {
+        for (Long id : ids) {
+            if (userRepository.findById(id).isEmpty()) {
+                throw new NotFoundException("User with " + id + " does not exist");
+            }
+        } 
+    }
+
     @Override
     public TeamDto createTeam(Long companyId, TeamRequestDto teamRequestDto) {
-        Team team = new Team();
+        Team team = teamMapper.requestDtoToEntity(teamRequestDto);
         Set<User> teammates = Set.copyOf(userRepository.findAllById(teamRequestDto.getTeammateIds()));
         Company company = findCompanyById(companyId);
+
+        checkUser(teamRequestDto.getTeammateIds());
         team.setName(teamRequestDto.getName());
         team.setDescription(teamRequestDto.getDescription());
         team.setCompany(company);
