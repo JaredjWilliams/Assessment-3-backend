@@ -14,13 +14,14 @@ import com.cooksys.groupfinal.dtos.ProjectDto;
 import com.cooksys.groupfinal.dtos.ProjectRequestDto;
 import com.cooksys.groupfinal.dtos.TeamDto;
 import com.cooksys.groupfinal.services.AnnouncementService;
+import com.cooksys.groupfinal.dtos.TeamRequestDto;
 import com.cooksys.groupfinal.services.CompanyService;
+import com.cooksys.groupfinal.services.TeamService;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PostMapping;
-
 
 
 @RestController
@@ -30,6 +31,7 @@ public class CompanyController {
 	
 	private final CompanyService companyService;
     private final AnnouncementService announcementService;
+    private final TeamService teamService;
 	
 	@GetMapping("/{id}/users")
     public Set<FullUserDto> getAllUsers(@PathVariable Long id) {
@@ -62,4 +64,8 @@ public class CompanyController {
 		return announcementService.createAnnouncement(companyId, userId, announcementRequestDto);
 	}
 
+    @PostMapping("/{companyId}/team")
+    public TeamDto createTeam(@PathVariable Long companyId, @RequestBody TeamRequestDto teamRequestDto) {        
+        return teamService.createTeam(companyId, teamRequestDto);
+    }
 }
