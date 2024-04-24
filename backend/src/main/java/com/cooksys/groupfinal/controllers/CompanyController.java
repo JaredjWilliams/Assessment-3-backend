@@ -3,6 +3,7 @@ package com.cooksys.groupfinal.controllers;
 import java.util.Set;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -53,7 +54,7 @@ public class CompanyController {
 		return companyService.getAllProjects(companyId, teamId);
 	}
 
-    @PutMapping("/{companyId}/teams/{teamId}/projects/{projectId}")
+    @PatchMapping("/{companyId}/teams/{teamId}/projects/{projectId}")
     public ProjectDto updateProjectStatus (@PathVariable Long companyId, @PathVariable Long teamId, @PathVariable Long projectId, @RequestBody ProjectRequestDto projectRequestDto) {
         return companyService.updateProjectStatus(companyId, teamId, projectId, projectRequestDto);
     }
