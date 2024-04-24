@@ -48,12 +48,22 @@ public class AnnouncementServiceImpl implements AnnouncementService {
         return userOptional.get();
     }
 
+    private void checkEmpty(String title, String message) {
+        if (title == ""){
+            throw new BadRequestException("Title cannot be empty");
+        }
+        if (message == "") {
+            throw new BadRequestException("Message cannot be empty");
+        }
+    }
+
     
     @Override
     public AnnouncementDto createAnnouncement(Long companyId, Long userId, AnnouncementRequestDto announcementRequestDto) {
 
         String title = announcementRequestDto.getTitle();
         String message = announcementRequestDto.getMessage();
+        checkEmpty(title, message);
 
         Company company = findCompanyById(companyId);
         User author = findUserById(userId);
