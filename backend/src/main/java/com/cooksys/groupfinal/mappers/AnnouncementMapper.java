@@ -11,6 +11,7 @@ import com.cooksys.groupfinal.entities.Announcement;
 
 @Mapper(componentModel = "spring", uses = { BasicUserMapper.class })
 public interface AnnouncementMapper {
+  @Mapping(source = "author.profile.firstName", target = "authorFirstName")
   @Mapping(source = "author.id", target = "authorId")
   @Mapping(source = "company.id", target = "companyId") 
 	AnnouncementDto entityToDto(Announcement announcement);
