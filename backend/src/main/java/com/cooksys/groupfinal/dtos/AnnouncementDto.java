@@ -19,7 +19,9 @@ public class AnnouncementDto {
     private String title;
     
     private String message;
-    
+
+    private String authorFirstName;
+
     private Long authorId;
 
     private Long companyId;
