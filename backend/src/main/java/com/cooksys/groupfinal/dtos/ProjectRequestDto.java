@@ -11,5 +11,5 @@ public class ProjectRequestDto {
     
     private String description;
 
-    private Boolean active = false;
+    private Boolean active;
 }
