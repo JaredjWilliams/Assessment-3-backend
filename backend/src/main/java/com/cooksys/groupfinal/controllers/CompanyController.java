@@ -8,15 +8,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cooksys.groupfinal.dtos.AnnouncementDto;
+import com.cooksys.groupfinal.dtos.AnnouncementRequestDto;
 import com.cooksys.groupfinal.dtos.FullUserDto;
 import com.cooksys.groupfinal.dtos.ProjectDto;
 import com.cooksys.groupfinal.dtos.ProjectRequestDto;
 import com.cooksys.groupfinal.dtos.TeamDto;
+import com.cooksys.groupfinal.services.AnnouncementService;
 import com.cooksys.groupfinal.services.CompanyService;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PostMapping;
+
 
 
 @RestController
@@ -25,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 public class CompanyController {
 	
 	private final CompanyService companyService;
+    private final AnnouncementService announcementService;
 	
 	@GetMapping("/{id}/users")
     public Set<FullUserDto> getAllUsers(@PathVariable Long id) {
@@ -50,5 +55,11 @@ public class CompanyController {
     public ProjectDto updateProjectStatus (@PathVariable Long companyId, @PathVariable Long teamId, @PathVariable Long projectId, @RequestBody ProjectRequestDto projectRequestDto) {
         return companyService.updateProjectStatus(companyId, teamId, projectId, projectRequestDto);
     }
+    
+
+	@PostMapping("/{companyId}/user/{userId}/announcements")
+	public AnnouncementDto createAnnouncement(@PathVariable Long companyId, @PathVariable Long userId, @RequestBody AnnouncementRequestDto announcementRequestDto) {
+		return announcementService.createAnnouncement(companyId, userId, announcementRequestDto);
+	}
 
 }
