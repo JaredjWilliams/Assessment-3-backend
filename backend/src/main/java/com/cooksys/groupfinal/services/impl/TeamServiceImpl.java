@@ -36,12 +36,32 @@ public class TeamServiceImpl implements TeamService {
         return companyOptional.get();
     }
 
+    public void checkUserExists(Set<Long> ids) {
+        for (Long id : ids) {
+            if (userRepository.findById(id).isEmpty()) {
+                throw new NotFoundException("User with " + id + " does not exist");
+            }
+            
+        } 
+    }
+
+    public void checkCompanyUsers(Set<Long> ids, Company company) {
+        for (Long id : ids) {
+            User user = userRepository.findById(id).get();
+            if (!company.getEmployees().contains(user)) {
+                throw new NotFoundException("User with " + id + " does not exist in this company: " + company.getId());
+            }
+        } 
+    }
+
     @Override
     public TeamDto createTeam(Long companyId, TeamRequestDto teamRequestDto) {
-        Team team = new Team();
-        // TODO: if some of those user ids don't map to a User, throw error?
+        Team team = teamMapper.requestDtoToEntity(teamRequestDto);
         Set<User> teammates = Set.copyOf(userRepository.findAllById(teamRequestDto.getTeammateIds()));
         Company company = findCompanyById(companyId);
+
+        checkUserExists(teamRequestDto.getTeammateIds());
+        checkCompanyUsers(teamRequestDto.getTeammateIds(), company);
         team.setName(teamRequestDto.getName());
         team.setDescription(teamRequestDto.getDescription());
         team.setCompany(company);
