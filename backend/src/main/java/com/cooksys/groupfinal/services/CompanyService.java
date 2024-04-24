@@ -10,6 +10,8 @@ import com.cooksys.groupfinal.dtos.TeamDto;
 
 public interface CompanyService {
 
+	Set<FullUserDto> getAllActiveUsers(Long id);
+
 	Set<FullUserDto> getAllUsers(Long id);
 
 	Set<AnnouncementDto> getAllAnnouncements(Long id);

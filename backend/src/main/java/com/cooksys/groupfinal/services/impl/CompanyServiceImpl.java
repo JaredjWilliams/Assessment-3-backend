@@ -75,13 +75,25 @@ public class CompanyServiceImpl implements CompanyService {
 		}
 	}
 
+	private void checkProjectNameEmpty(String name) {
+		if (name.equals("")) {
+			throw new BadRequestException("Cannot set project name to be empty!");
+		} else {
+		}
+	}
+
 	@Override
-	public Set<FullUserDto> getAllUsers(Long id) {
+	public Set<FullUserDto> getAllActiveUsers(Long id) {
 		Company company = findCompany(id);
 		Set<User> filteredUsers = new HashSet<>();
 		company.getEmployees().forEach(filteredUsers::add);
 		filteredUsers.removeIf(user -> !user.isActive());
 		return fullUserMapper.entitiesToFullUserDtos(filteredUsers);
+	}
+
+	@Override
+	public Set<FullUserDto> getAllUsers(Long id) {
+		return fullUserMapper.entitiesToFullUserDtos(findCompany(id).getEmployees());
 	}
 
 	@Override
