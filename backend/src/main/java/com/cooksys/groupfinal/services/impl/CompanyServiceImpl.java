@@ -75,13 +75,6 @@ public class CompanyServiceImpl implements CompanyService {
 		}
 	}
 
-	private void checkProjectNameEmpty(String name) {
-		if (name.equals("")) {
-			throw new BadRequestException("Cannot set project name to be empty!");
-		} else {
-		}
-	}
-	
 	@Override
 	public Set<FullUserDto> getAllUsers(Long id) {
 		Company company = findCompany(id);
@@ -131,11 +124,17 @@ public class CompanyServiceImpl implements CompanyService {
 		// 	throw new BadRequestException("A team with id " + projectRequestDto.getTeam() + " cannot change the project for team with id " + teamId);
 		// }
 
-		project.setActive(projectRequestDto.getActive());
-		project.setDescription(projectRequestDto.getDescription());
+		if (projectRequestDto.getDescription() != null) {
+			project.setDescription(projectRequestDto.getDescription());
+		}
 
-		checkProjectNameEmpty(projectRequestDto.getName());
-		project.setName(projectRequestDto.getName());
+		if (projectRequestDto.getName() != null) {
+			project.setName(projectRequestDto.getName());
+		}
+
+		if ( projectRequestDto.getActive() != null ) {
+            project.setActive( projectRequestDto.getActive() );
+        }
 
 		projectRepository.saveAndFlush(project);
 
