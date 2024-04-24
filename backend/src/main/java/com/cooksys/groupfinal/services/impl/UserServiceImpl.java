@@ -71,6 +71,14 @@ public class UserServiceImpl implements UserService {
     }
 	
 	
+    @Override
+    public BasicUserDto createUser(UserRequestDto userRequestDto) {
+        User userToSave = basicUserMapper.requestDtoToEntity(userRequestDto);
+        
+        userRepository.saveAndFlush(userToSave);
+
+        return basicUserMapper.entityToBasicUserDto(userToSave);
+    }
 	
 	
 	
