@@ -3,8 +3,6 @@ package com.cooksys.groupfinal.services.impl;
 import java.util.Optional;
 import java.util.Set;
 
-import javax.swing.text.html.HTMLDocument.Iterator;
-
 import org.springframework.stereotype.Service;
 
 import com.cooksys.groupfinal.dtos.TeamDto;
