@@ -34,8 +34,8 @@ public class UserController {
         return userService.changeUserAdminStatus(id, adminStatus);
     }
 
-    @PostMapping("") 
-    public BasicUserDto createUser(@RequestBody UserRequestDto userRequestDto) {
-        return userService.createUser(userRequestDto);
+    @PostMapping("/company/{companyId}")
+    public BasicUserDto createUser(@PathVariable Long companyId, @RequestBody UserRequestDto userRequestDto) {
+        return userService.createUser(companyId, userRequestDto);
     }
 }

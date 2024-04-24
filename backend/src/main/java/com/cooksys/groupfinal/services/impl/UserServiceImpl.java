@@ -8,6 +8,7 @@ import com.cooksys.groupfinal.dtos.BasicUserDto;
 import com.cooksys.groupfinal.dtos.CredentialsDto;
 import com.cooksys.groupfinal.dtos.FullUserDto;
 import com.cooksys.groupfinal.dtos.UserRequestDto;
+import com.cooksys.groupfinal.entities.Company;
 import com.cooksys.groupfinal.entities.Credentials;
 import com.cooksys.groupfinal.entities.User;
 import com.cooksys.groupfinal.exceptions.BadRequestException;
@@ -16,6 +17,7 @@ import com.cooksys.groupfinal.exceptions.NotFoundException;
 import com.cooksys.groupfinal.mappers.BasicUserMapper;
 import com.cooksys.groupfinal.mappers.CredentialsMapper;
 import com.cooksys.groupfinal.mappers.FullUserMapper;
+import com.cooksys.groupfinal.repositories.CompanyRepository;
 import com.cooksys.groupfinal.repositories.UserRepository;
 import com.cooksys.groupfinal.services.UserService;
 
@@ -26,6 +28,7 @@ import lombok.RequiredArgsConstructor;
 public class UserServiceImpl implements UserService {
 	
 	private final UserRepository userRepository;
+    private final CompanyRepository companyRepository;
     private final FullUserMapper fullUserMapper;
     private final BasicUserMapper basicUserMapper;
 	private final CredentialsMapper credentialsMapper;
@@ -44,6 +47,14 @@ public class UserServiceImpl implements UserService {
             throw new NotFoundException("The id provided does not belong to an active user.");
         }
         return user.get();
+    }
+
+    private Company findCompanyById(Long id) {
+        Optional<Company> companyOptional = companyRepository.findById(id);
+        if (companyOptional.isEmpty()) {
+            throw new NotFoundException("Company with given id could not found");
+        }
+        return companyOptional.get();
     }
 	
 	@Override
@@ -72,16 +83,19 @@ public class UserServiceImpl implements UserService {
 	
 	
     @Override
-    public BasicUserDto createUser(UserRequestDto userRequestDto) {
+    public BasicUserDto createUser(Long companyId, UserRequestDto userRequestDto) {
     	
     	if (!userRepository.findByCredentialsUsername(userRequestDto.getCredentials().getUsername()).isEmpty()){
     		throw new BadRequestException("Username already exists");
     	}
     	
         User userToSave = basicUserMapper.requestDtoToEntity(userRequestDto);
+        Company company = findCompanyById(companyId);
+        userToSave.getCompanies().add(company);
+        company.getEmployees().add(userToSave);
         
-        userRepository.saveAndFlush(userToSave);
-
+        userToSave = userRepository.saveAndFlush(userToSave);
+        companyRepository.saveAndFlush(company);
         return basicUserMapper.entityToBasicUserDto(userToSave);
     }
 	
