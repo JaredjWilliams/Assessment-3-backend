@@ -126,9 +126,10 @@ public class CompanyServiceImpl implements CompanyService {
 
 		Project project = findProject(projectId);
 
-		if (!teamId.equals(projectRequestDto.getTeam())) {
-			throw new BadRequestException("A team with id " + projectRequestDto.getTeam() + " cannot change the project for team with id " + teamId);
-		}
+		// TODO: find alternative for this logic. we deleted the teamId field
+		// if (!teamId.equals(projectRequestDto.getTeam())) {
+		// 	throw new BadRequestException("A team with id " + projectRequestDto.getTeam() + " cannot change the project for team with id " + teamId);
+		// }
 
 		project.setActive(projectRequestDto.getActive());
 		project.setDescription(projectRequestDto.getDescription());
