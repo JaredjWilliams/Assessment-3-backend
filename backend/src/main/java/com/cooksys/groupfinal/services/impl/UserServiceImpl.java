@@ -71,6 +71,19 @@ public class UserServiceImpl implements UserService {
     }
 	
 	
+    @Override
+    public BasicUserDto createUser(UserRequestDto userRequestDto) {
+    	
+    	if (!userRepository.findByCredentialsUsername(userRequestDto.getCredentials().getUsername()).isEmpty()){
+    		throw new BadRequestException("Username already exists");
+    	}
+    	
+        User userToSave = basicUserMapper.requestDtoToEntity(userRequestDto);
+        
+        userRepository.saveAndFlush(userToSave);
+
+        return basicUserMapper.entityToBasicUserDto(userToSave);
+    }
 	
 	
 	
