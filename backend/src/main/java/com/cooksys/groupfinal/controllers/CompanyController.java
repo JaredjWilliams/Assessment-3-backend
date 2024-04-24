@@ -35,6 +35,11 @@ public class CompanyController {
     private final TeamService teamService;
 	
 	@GetMapping("/{id}/users")
+    public Set<FullUserDto> getAllActiveUsers(@PathVariable Long id) {
+        return companyService.getAllActiveUsers(id);
+    }
+
+    @GetMapping("/{id}/users/all")
     public Set<FullUserDto> getAllUsers(@PathVariable Long id) {
         return companyService.getAllUsers(id);
     }
