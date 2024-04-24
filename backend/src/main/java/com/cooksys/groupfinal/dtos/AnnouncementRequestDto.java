@@ -1,27 +1,21 @@
 package com.cooksys.groupfinal.dtos;
 
-import java.sql.Timestamp;
+import java.security.Timestamp;
+
+import org.apache.tomcat.jni.Time;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 
 @NoArgsConstructor
 @Data
-public class AnnouncementDto {
-	
-    @NonNull
-	private Long id;
-    
-    @NonNull
-    private Timestamp date;
-    
+public class AnnouncementRequestDto {
     private String title;
     
     private String message;
     
     private Long authorId;
 
-    private Long companyId;
+    private Long teamId;
 
 }
