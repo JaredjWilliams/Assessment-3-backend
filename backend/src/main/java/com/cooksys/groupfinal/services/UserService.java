@@ -10,5 +10,5 @@ public interface UserService {
 
 	FullUserDto login(CredentialsDto credentialsDto);
 	BasicUserDto changeUserAdminStatus(Long id, boolean adminStatus);
-	BasicUserDto createUser(UserRequestDto userRequestDto);
+	BasicUserDto createUser(Long companyId, UserRequestDto userRequestDto);
 }
