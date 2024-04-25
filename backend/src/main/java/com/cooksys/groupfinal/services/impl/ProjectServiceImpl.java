@@ -52,4 +52,18 @@ public class ProjectServiceImpl implements ProjectService {
         project = projectRepository.saveAndFlush(project);
         return projectMapper.entityToDto(project);
 	}
+
+    @Override
+    public ProjectDto updateProject(Long teamId, Long projectId, ProjectRequestDto projectRequestDto) {
+
+        Team team = findTeamById(teamId);
+        Project project = projectRepository.findById(projectId).orElseThrow(() -> new NotFoundException("Project with the given id could not be found"));
+
+        project.setName(projectRequestDto.getName());
+        project.setDescription(projectRequestDto.getDescription());
+        project.setActive(projectRequestDto.getActive());
+        project.setTeam(team);
+
+        return projectMapper.entityToDto(projectRepository.saveAndFlush(project));
+    }
 }
