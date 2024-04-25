@@ -57,7 +57,6 @@ public class TeamServiceImpl implements TeamService {
     @Override
     public TeamDto createTeam(Long companyId, TeamRequestDto teamRequestDto) {
         Team team = teamMapper.requestDtoToEntity(teamRequestDto);
-        System.out.println("teamRequestDto.getTeammateIds(): " + teamRequestDto.getTeammateIds());
         Set<User> teammates = Set.copyOf(userRepository.findAllById(teamRequestDto.getTeammateIds()));
         Company company = findCompanyById(companyId);
 
